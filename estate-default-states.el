@@ -29,15 +29,15 @@
 (require 'estate)
 
 (defun estate--activate-initialize-core-states ()
-  (add-hook 'activate-mark-hook #'estate--mark-activate-hook 0 t)
-  (add-hook 'deactivate-mark-hook #'estate--mark-deactivate-hook 0 t)
+  (add-hook 'activate-mark-hook 'estate--mark-activate-hook 0 t)
+  (add-hook 'deactivate-mark-hook 'estate--mark-deactivate-hook 0 t)
   )
 (defun estate--deactivate-initialize-core-states ()
-  (remove-hook 'activate-mark-hook #'estate--mark-activate-hook t)
-  (remove-hook 'deactivate-mark-hook #'estate--mark-deactivate-hook t)
+  (remove-hook 'activate-mark-hook 'estate--mark-activate-hook t)
+  (remove-hook 'deactivate-mark-hook 'estate--mark-deactivate-hook t)
   )
-(add-hook 'estate-activate-hook #'estate--activate-initialize-core-states)
-(add-hook 'estate-deactivate-hook #'estate--deactivate-initialize-core-states)
+(add-hook 'estate-activate-hook 'estate--activate-initialize-core-states)
+(add-hook 'estate-deactivate-hook 'estate--deactivate-initialize-core-states)
 
 (when (not estate-set-initial-state-function)
   (setq estate-set-initial-state-function 'estate--default-set-initial-state-function-for-vim-like-states))
@@ -108,7 +108,6 @@ This allows you to create bindings like Vim's change operator that do some edit 
 (defun estate--mark-deactivate-hook ()
   (estate--visual-state-change 'deactivate))
 
-
 (defvar-local estate--pre-visual-state 'normal)
 
 (defun estate--visual-state-change (&optional reason)
@@ -117,7 +116,8 @@ This allows you to create bindings like Vim's change operator that do some edit 
     (setq-local estate--previous-state estate-state))
   (if (region-active-p)
       (estate-activate-state 'visual)
-    nil))
+    (when (equal estate-state 'visual)
+      (estate-normal-state))))
 
 (defun estate--visual-mark-initialize ()
   (unless (region-active-p)
