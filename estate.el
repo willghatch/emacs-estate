@@ -69,7 +69,7 @@ You probably want more fine grained control over this, so you should write such 
       (run-hooks 'estate-deactivate-hook)
       )))
 
-(defvar estate-mode-activate-predicate nil
+(defvar estate-mode-activate-predicate (lambda () (not (minibufferp)))
   "Predicate for whether to turn on estate-mode in a buffer.
 Can be nil to always enable, or a function that returns non-nil when the mode should be enabled.
 The function takes no arguments, and probably should inspect the 'major-mode' variable or `minibufferp' or such.")
