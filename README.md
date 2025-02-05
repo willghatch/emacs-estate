@@ -12,6 +12,10 @@ Define states with `estate-define-state`.
 If you write `(estate-define-state excitement tubular-keymap)`, you will define a state of excitement that comes with `estate-excitement-state-keymap` which inherits from `tubular-keymap`, `estate-excitement-state-buffer-local-keymap` which is initially null, `estate-excitement-state-enter-hook`, `estate-excitement-state-exit-hook`, and `estate-excitement-state` to activate the state.
 Change states with `estate-activate-state`, giving the state's symbol passed to `estate-define-state`, or (equivalently) by calling the defined activation function.
 If your state wants some extra setup, you can wrap `estate-activate-state` with your own function or use the hooks.
+You also need to activate `(estate-mode 1)` to start your stateful editing.
+See also `estate-mode-activate-predicate`, which determines whether `estate-local-mode` is activated for any particular buffer type.
+By default it is not active in minibuffers.
+Also set `estate-set-initial-state-function`, which is run when `estate-local-mode` is activated, and which should activate some state.
 
 ## estate-default-states.el
 
@@ -24,6 +28,9 @@ If you `(require 'estate-default-states)`, you get some pre-defined states that 
 * `estate-pager-state`, whose keymap inherits from motion-state.  The buffer is set to read-only when pager-state is active.
 
 IMPORTANT: by default the key maps for these modes have NO KEY BINDINGS.  If you activate estate-mode without defining key bindings (or using some other package that defines them), you will be stuck.
+
+Note that if `estate-set-initial-state-function` is unset, it will be set to insert state for minibuffers (though unless you override `estate-mode-activate-predicate` it will not even activate for those), and normal state for all others.
+You probably want to set this to some function that checks more conditions to use insert state in eg. `term-mode`.
 
 
 ## Why does this package exist?
