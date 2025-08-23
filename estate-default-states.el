@@ -29,12 +29,10 @@
 (require 'estate)
 
 (defun estate--activate-initialize-core-states ()
-  (add-hook 'activate-mark-hook 'estate--mark-activate-hook 0 t)
-  (add-hook 'deactivate-mark-hook 'estate--mark-deactivate-hook 0 t)
+  (add-hook 'post-command-hook 'estate--check-visual-state-post-command 97 t)
   )
 (defun estate--deactivate-initialize-core-states ()
-  (remove-hook 'activate-mark-hook 'estate--mark-activate-hook t)
-  (remove-hook 'deactivate-mark-hook 'estate--mark-deactivate-hook t)
+  (remove-hook 'post-command-hook 'estate--check-visual-state-post-command t)
   )
 (add-hook 'estate-activate-hook 'estate--activate-initialize-core-states)
 (add-hook 'estate-deactivate-hook 'estate--deactivate-initialize-core-states)
@@ -103,10 +101,9 @@ This allows you to create bindings like Vim's change operator that do some edit 
 ;; visual mode presupposes that you are using and want to use transient-mark-mode.
 (estate-define-state visual estate-normal-state-keymap)
 
-(defun estate--mark-activate-hook ()
-  (estate--visual-state-change 'activate))
-(defun estate--mark-deactivate-hook ()
-  (estate--visual-state-change 'deactivate))
+(defun estate--check-visual-state-post-command ()
+  "Check if we should be in visual state based on region activation."
+  (estate--visual-state-change))
 
 (defvar-local estate--pre-visual-state 'normal)
 
