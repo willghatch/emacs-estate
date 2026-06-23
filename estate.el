@@ -82,6 +82,31 @@ The function takes no arguments, and probably should inspect the 'major-mode' va
 (define-globalized-minor-mode estate-mode
   estate-local-mode estate-mode--initialize)
 
+;; define-globalized-minor-mode only fires estate-mode--initialize via
+;; after-change-major-mode-hook, which requires an explicit major-mode call.
+;; Buffers created with get-buffer-create (and never given a mode) are missed.
+;; So let's add a hook to catch these buffers when they become active in windows.
+;; window-buffer-change-functions only covers windows whose buffer changed, not
+;; newly-created windows.  window-configuration-change-hook covers all layout
+;; changes (including display-buffer creating a new window), so walk all visible
+;; windows there to catch any uninitialised buffer.
+(defun estate--window-configuration-change-handler ()
+  (walk-windows
+   (lambda (window)
+     (with-current-buffer (window-buffer window)
+       (unless estate-local-mode
+         (estate-mode--initialize))))
+   nil t))
+
+(defun estate--update-window-config-hook ()
+  (if estate-mode
+      (add-hook 'window-configuration-change-hook
+                #'estate--window-configuration-change-handler)
+    (remove-hook 'window-configuration-change-hook
+                 #'estate--window-configuration-change-handler)))
+
+(add-hook 'estate-mode-hook #'estate--update-window-config-hook)
+
 (defvar estate-state-change-hook '()
   "Hook called for every estate state change.
 Called after the exit-hook of the previous state, but before the enter-hook of the new state.
